@@ -1,0 +1,1 @@
+/* This will be where an error page format will be */

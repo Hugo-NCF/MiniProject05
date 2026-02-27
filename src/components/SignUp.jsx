@@ -1,0 +1,1 @@
+/* This will be where the SignUp page format will be (sign up system with firebase) */
