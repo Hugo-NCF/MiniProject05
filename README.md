@@ -8,9 +8,7 @@ It loads a local dataset from `public/movies.json` and provides a dashboard-styl
 
 ## Live Link
 
-Add your deployed link here (Netlify/Vercel/Firebase Hosting):
-
-- TBD
+https://hdmoviesncf2.netlify.app/
 
 ## Tech Stack
 
