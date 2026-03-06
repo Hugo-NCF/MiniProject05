@@ -14,10 +14,10 @@ export default function SharedNavbar() {
   const avatarFallbackLetter = (userLabel?.trim?.()?.[0] || "?").toUpperCase();
 
   return (
-    <header className="navbar bg-base-100 shadow-md px-6 w-full sticky top-0 z-50">
-      <div className="flex-1 flex items-center gap-6">
-        <FaFilm className="text-2xl text-primary" />
-        <NavLink to="/" className="text-2xl font-bold">
+    <header className="navbar bg-base-100 shadow-md px-4 w-full sticky top-0 z-50">
+      <div className="flex-1 flex items-center gap-4">
+        <FaFilm className="text-xl text-primary" />
+        <NavLink to="/" className="text-xl font-bold">
           Movies HD
         </NavLink>
       </div>
@@ -53,29 +53,29 @@ export default function SharedNavbar() {
         )}
         </nav>
 
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center leading-tight">
           {user ? (
             avatarSrc ? (
               <div className="avatar">
-                <div className="w-14 rounded-full">
+                <div className="w-10 rounded-full">
                   <img src={avatarSrc} alt="Profile" />
                 </div>
               </div>
             ) : (
               <div className="avatar placeholder">
-                <div className="bg-base-300 text-base-content w-14 rounded-full flex items-center justify-center">
-                  <span className="text-lg">{avatarFallbackLetter}</span>
+                <div className="bg-base-300 text-base-content w-10 rounded-full flex items-center justify-center">
+                  <span className="text-base">{avatarFallbackLetter}</span>
                 </div>
               </div>
             )
           ) : (
             <div className="avatar placeholder">
-              <div className="bg-base-300 text-base-content w-14 rounded-full flex items-center justify-center">
-                <span className="text-lg">G</span>
+              <div className="bg-base-300 text-base-content w-10 rounded-full flex items-center justify-center">
+                <span className="text-base">G</span>
               </div>
             </div>
           )}
-          <div className="mt-1 w-20 text-center text-xs opacity-70 truncate">
+          <div className="mt-0.5 w-16 text-center text-[11px] opacity-70 truncate">
             {userLabel}
           </div>
         </div>
