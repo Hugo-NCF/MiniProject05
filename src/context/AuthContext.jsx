@@ -17,6 +17,12 @@ export function AuthProvider({ children }) {
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setUser(null);
+      setInitializing(false);
+      return;
+    }
+
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u ?? null);
       setInitializing(false);
@@ -26,11 +32,20 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(() => {
+    const requireFirebaseAuth = () => {
+      if (!auth) {
+        throw new Error(
+          "Firebase Auth is not configured yet. Create a .env (see .env.example) and restart `npm run dev`.",
+        );
+      }
+    };
+
     return {
       user,
       initializing,
 
       async signup(email, password, displayName) {
+        requireFirebaseAuth();
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         if (displayName) {
           await updateProfile(cred.user, { displayName });
@@ -39,16 +54,24 @@ export function AuthProvider({ children }) {
       },
 
       async login(email, password) {
+        requireFirebaseAuth();
         const cred = await signInWithEmailAndPassword(auth, email, password);
         return cred.user;
       },
 
       async loginWithGoogle() {
+        requireFirebaseAuth();
+        if (!googleProvider) {
+          throw new Error(
+            "Google provider is not configured. Check Firebase config and restart `npm run dev`.",
+          );
+        }
         const cred = await signInWithPopup(auth, googleProvider);
         return cred.user;
       },
 
       async logout() {
+        requireFirebaseAuth();
         await signOut(auth);
       },
     };

@@ -3,7 +3,7 @@ import AppLayout from "../layouts/AppLayout.jsx";
 
 import LandingHome from "../components/LandingHome.jsx";
 import Login from "../components/Login.jsx";
-import Signup from "../components/Signup.jsx";
+import Signup from "../components/SignUp.jsx";
 import Dashboard from "../components/Dashboard.jsx";
 import Unauthorized from "../components/Unauthorized.jsx";
 import NotFound from "../components/NotFound.jsx";
