@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -68,6 +69,15 @@ export function AuthProvider({ children }) {
         }
         const cred = await signInWithPopup(auth, googleProvider);
         return cred.user;
+      },
+
+      async resetPassword(email) {
+        requireFirebaseAuth();
+        const cleaned = String(email ?? "").trim();
+        if (!cleaned) {
+          throw new Error("Please enter your email address first.");
+        }
+        await sendPasswordResetEmail(auth, cleaned);
       },
 
       async logout() {

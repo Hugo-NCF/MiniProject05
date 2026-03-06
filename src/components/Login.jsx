@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Login() {
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, resetPassword } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -12,11 +12,14 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [infoMsg, setInfoMsg] = useState("");
 
   async function onSubmit(e) {
     e.preventDefault();
     setErrorMsg("");
+    setInfoMsg("");
     setSubmitting(true);
 
     try {
@@ -31,6 +34,7 @@ export default function Login() {
 
   async function onGoogle() {
     setErrorMsg("");
+    setInfoMsg("");
     setSubmitting(true);
 
     try {
@@ -43,6 +47,27 @@ export default function Login() {
     }
   }
 
+  async function onResetPassword() {
+    setErrorMsg("");
+    setInfoMsg("");
+
+    const cleaned = email.trim();
+    if (!cleaned) {
+      setErrorMsg("Enter your email above to reset your password.");
+      return;
+    }
+
+    setResetting(true);
+    try {
+      await resetPassword(cleaned);
+      setInfoMsg("Password reset email sent. Check your inbox.");
+    } catch (err) {
+      setErrorMsg(err?.message ?? "Password reset failed");
+    } finally {
+      setResetting(false);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-lg px-6 py-10">
       <h1 className="text-3xl font-bold">Login</h1>
@@ -50,6 +75,12 @@ export default function Login() {
       {errorMsg && (
         <div className="alert alert-error mt-4">
           <span>{errorMsg}</span>
+        </div>
+      )}
+
+      {infoMsg && (
+        <div className="alert alert-info mt-4">
+          <span>{infoMsg}</span>
         </div>
       )}
 
@@ -81,6 +112,15 @@ export default function Login() {
             required
           />
         </label>
+
+        <button
+          type="button"
+          className="btn btn-ghost w-full"
+          onClick={onResetPassword}
+          disabled={submitting || resetting}
+        >
+          {resetting ? "Sending reset email…" : "Change password"}
+        </button>
 
         <button
           className="btn btn-primary w-full mt-2"
