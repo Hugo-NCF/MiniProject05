@@ -1,6 +1,4 @@
 import {
-  FaChevronDown,
-  FaFilm,
   FaGithub,
   FaInfoCircle,
   FaLock,
@@ -8,6 +6,9 @@ import {
   FaDownload,
 } from "react-icons/fa";
 import { useCallback, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
+import AppNavbar from "./AppNavbar.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function defaultMovieKey(movie) {
   return `${movie?.title ?? "movie"}-${movie?.releasing_year ?? ""}-${movie?.director ?? ""}`;
@@ -24,6 +25,11 @@ function MovieSiteLayout({
   onToggleWishlistKey,
   onClearWishlist,
 }) {
+  const { user } = useAuth();
+  const isAuthed = !!user;
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const ageGroups = browseOptions?.ageGroups ?? [];
   const genres = browseOptions?.genres ?? [];
   const decades = browseOptions?.decades ?? [];
@@ -42,7 +48,15 @@ function MovieSiteLayout({
     return movies.filter((m) => set.has(movieKey(m)));
   }, [movies, wishlistedKeys, movieKey]);
 
+  function requireAuth() {
+    if (isAuthed) return true;
+    navigate("/login", { replace: false, state: { from: location } });
+    return false;
+  }
+
   function downloadWishlist() {
+    if (!requireAuth()) return;
+
     const exportList = wishlistedMovies.map((m) => ({
       title: m?.title ?? "",
       director: m?.director ?? "",
@@ -75,137 +89,27 @@ function MovieSiteLayout({
     URL.revokeObjectURL(url);
   }
 
-  function closeBrowseDropdown(e) {
-    const details = e?.currentTarget?.closest?.("details.dropdown");
-    if (details) details.removeAttribute("open");
-  }
-
   return (
     <div className="min-h-screen flex flex-col bg-base-200 w-full">
-      
-      {/* Header */}
-      <header className="navbar bg-base-100 shadow-md px-6 w-full sticky top-0 z-50">
+      <AppNavbar
+        loading={loading}
+        ageGroups={ageGroups}
+        genres={genres}
+        decades={decades}
+        onBrowseSelect={(payload) => {
+          if (!requireAuth()) return;
+          onBrowseSelect?.(payload);
+        }}
+        wishlistCount={wishlistCount}
+        wishlistOpen={wishlistOpen}
+        onToggleWishlist={() => {
+          if (!requireAuth()) return;
+          setWishlistOpen((v) => !v);
+        }}
+        showBrowseWishlist={isAuthed}
+      />
 
-  {/* Left: Logo + Title + Browse */}
-  <div className="flex-1 flex items-center gap-6">
-    <FaFilm className="text-2xl text-primary" />
-    <h1 className="text-2xl font-bold">Movies HD</h1>
-
-    <details className={`dropdown group ${loading ? "opacity-70 pointer-events-none" : ""}`}>
-      <summary className="btn btn-ghost list-none" aria-disabled={loading}>
-        <span className="flex items-center gap-2">
-          <span>Browse</span>
-          {loading ? (
-            <span className="loading loading-spinner loading-xs" />
-          ) : (
-            <FaChevronDown className="transition-transform group-open:rotate-180" />
-          )}
-        </span>
-      </summary>
-
-      <ul className="dropdown-content menu bg-base-100 rounded-box z-10 mt-2 w-52 p-2 shadow">
-        {loading ? (
-          <li>
-            <div className="flex items-center justify-center py-6">
-              <span className="loading loading-spinner loading-md" />
-            </div>
-          </li>
-        ) : (
-          <>
-            <li>
-              <details>
-                <summary>Age group</summary>
-                <ul>
-                  {ageGroups.map((g) => (
-                    <li key={g}>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          onBrowseSelect?.({ type: "age_group", value: g });
-                          closeBrowseDropdown(e);
-                        }}
-                      >
-                        {g}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            </li>
-
-            <li>
-              <details>
-                <summary>Genre</summary>
-                <ul>
-                  {genres.map((g) => (
-                    <li key={g}>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          onBrowseSelect?.({ type: "genre", value: g });
-                          closeBrowseDropdown(e);
-                        }}
-                      >
-                        {g}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            </li>
-
-            <li>
-              <details>
-                <summary>Year</summary>
-                <ul>
-                  {decades.map((d) => (
-                    <li key={d?.start ?? d?.label}>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          onBrowseSelect?.({ type: "decade", value: d?.start });
-                          closeBrowseDropdown(e);
-                        }}
-                      >
-                        {d?.label ?? String(d)}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            </li>
-          </>
-        )}
-      </ul>
-    </details>
-  </div>
-
-  {/* Right: Wishlist + Avatar */}
-  <div className="flex-none flex items-center gap-4">
-    <button
-      type="button"
-      className="btn btn-ghost"
-      onClick={() => setWishlistOpen((v) => !v)}
-      aria-expanded={wishlistOpen}
-    >
-      <span className="flex items-center gap-2">
-        <span>Wishlist</span>
-        <span className="badge badge-sm rounded-full min-w-5 h-5 px-1 flex items-center justify-center">
-          {wishlistCount}
-        </span>
-      </span>
-    </button>
-    
-    <div className="avatar">
-      <div className="w-14 rounded-full">
-        <img src="https://img.daisyui.com/images/profile/demo/batperson@192.webp" />
-      </div>
-    </div>
-  </div>
-
-</header>
-
-      {wishlistOpen && (
+      {isAuthed && wishlistOpen && (
         <div className="fixed left-0 right-0 bottom-0 top-16 z-40">
           <button
             type="button"
@@ -232,7 +136,10 @@ function MovieSiteLayout({
                   <button
                     type="button"
                     className="btn btn-sm btn-outline"
-                    onClick={() => onClearWishlist?.()}
+                    onClick={() => {
+                      if (!requireAuth()) return;
+                      onClearWishlist?.();
+                    }}
                   >
                     Clear all
                   </button>
@@ -262,7 +169,10 @@ function MovieSiteLayout({
                       <button
                         type="button"
                         className="btn btn-xs btn-outline"
-                        onClick={() => onToggleWishlistKey?.(movieKey(m))}
+                        onClick={() => {
+                          if (!requireAuth()) return;
+                          onToggleWishlistKey?.(movieKey(m));
+                        }}
                       >
                         Remove
                       </button>

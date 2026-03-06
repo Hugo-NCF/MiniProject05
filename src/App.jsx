@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import MovieSiteLayout from "./components/MovieSiteLayout";
 import Home from "./components/Home";
+import { useAuth } from "./context/AuthContext.jsx";
 
 export default function App() {
+  const { user } = useAuth();
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
@@ -84,6 +86,7 @@ export default function App() {
 
   return (
     <MovieSiteLayout
+      key={user?.uid ?? "guest"}
       browseOptions={browseOptions}
       onBrowseSelect={handleBrowseSelect}
       movies={movies}
