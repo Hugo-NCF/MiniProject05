@@ -1,18 +1,42 @@
-# Movies HD (MiniProject04)
+# Movies HD (MiniProject05)
 
 **Group Members:** Darius Beckford, Hugo Cruz
 
-A Vite + React movie browser that loads a local dataset (public/movies.json), lets users browse by **age group / genre / year (decades)**, sort results, and manage a **wishlist** (with download support).
+Movies HD is a Vite + React **SPA** that uses **React Router (data mode)** for client-side routing and **Firebase Authentication** for user accounts.
 
-## Netlify Link
-https://hdmoviesncf.netlify.app/
+It loads a local dataset from `public/movies.json` and provides a dashboard-style browsing experience. Unauthenticated users can view a **Preview** route, while authenticated users can access the full **Dashboard** route.
 
-## How to run
+## Live Link
 
-Install dependencies and start dev server:
+Add your deployed link here (Netlify/Vercel/Firebase Hosting):
+
+- TBD
+
+## Tech Stack
+
+- Vite + React
+- React Router (data router via `createBrowserRouter`)
+- Firebase Auth (Email/Password + Google)
+- React Context API for global auth state
+- TailwindCSS + DaisyUI for UI
+- React Icons
+
+## How to Run
+
+Install dependencies:
 
 ```bash
 npm install
+```
+
+Create your environment file (required for auth):
+
+1) Copy `.env.example` to `.env`
+2) Fill in your Firebase web app config values
+
+Start dev server:
+
+```bash
 npm run dev
 ```
 
@@ -23,51 +47,94 @@ npm run build
 npm run preview
 ```
 
-## Component structure
+## Firebase Setup (Auth)
 
-The app is split into focused components:
+1) Go to https://console.firebase.google.com and create a project.
+2) Build → Authentication → Sign-in method → enable:
+	- Email/Password
+	- Google
+3) Project Settings (gear) → Your apps → Web app (`</>`)
+4) Copy the config values into `.env` (do not commit `.env`).
 
-- src/App.jsx: loads movie data, owns shared app state (browse selection + wishlist)
-- src/components/MovieSiteLayout.jsx: header/navbar, wishlist panel UI, footer
-- src/components/Home.jsx: selected movie panel + filtered/sorted list logic
-- src/components/RecommendedRow.jsx: list row + sort dropdown
-- src/components/SelectedMovieDetails.jsx: top details panel UI
-- src/components/BaseMovieCard.jsx: movie card used in the carousel/list
+This project reads these variables:
 
-## Rubric checklist
+```dotenv
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_FIREBASE_MEASUREMENT_ID=
+```
 
-1) Make sure to use useEffect and useState properly and apply utility-first CSS for styling.
-- Movies are fetched once using useEffect and stored in useState.
-- Tailwind/DaisyUI utility classes are used throughout the UI.
+## Routes (User Flow)
 
-2) Create components as necessary to keep the root component (e.g., App) as clean as possible.
-- App focuses on data loading + shared state; UI is broken into layout + feature components.
+Public:
 
-3) Don't forget to add a loader (DaisyUI has some nice ones).
-- DaisyUI spinners appear while loading in the main area, Browse dropdown, and wishlist panel.
+- `/` → Landing page
+- `/login` → Login page
+- `/signup` → Signup page
+- `/guest` → Preview (guest-friendly “dashboard style” view)
 
-4) The app should have a title/header with some icon, a navbar, appropriate buttons (like, dislike), and a footer.
-- Header includes an icon and a sticky navbar with Browse + Wishlist.
-- Like/Dislike/Wishlist buttons are available in the selected-movie panel.
-- Footer includes extra content and icon links.
+Protected:
 
-5) The app must include a way for users to find movies by age group, genre, and year.
-- Browse dropdown provides age group, genre, and decade/year filtering.
+- `/dashboard` → Full dashboard (requires authentication)
 
-6) The app must include a way for the user to view a sorted list.
-- Default sort is by release year (latest → oldest).
-- Additional sorts: Rating and Alphabetical.
+Errors:
 
-7) The user must be able to download the list of their wishlisted movies.
-- Download button exports the current wishlisted movies to a readable JSON file.
+- `/401` → Unauthorized (shown when guests try to access protected routes)
+- `*` → 404 Not Found
 
-8) Carefully design the frontend; display movie information modularly.
-- Details panel and movie metadata are displayed using modular sections/badges.
-- Layout is organized into reusable components.
+## Authentication Features
 
-9) Use appropriate messages for search options.
-- Alerts appear when a filter results in no matches (e.g., “No movies match this selection.”).
+- Signup (Email/Password)
+- Login (Email/Password)
+- Login with Google
+- Logout
+- Password reset email (“Change password” from Login page)
 
-10) Use third-party libraries to make your app look more interesting.
-- DaisyUI provides UI components and loaders.
-- React Icons provides icons used across the app.
+### Basic Validation
+
+Client-side + context-level validation is included:
+
+- **Email:** required + basic format check
+- **Password:** required + minimum 6 characters
+- **Name:** optional; if provided must be 2–40 characters
+- **Confirm password:** must match password
+
+## Project Structure (Key Files)
+
+- `src/main.jsx` — Router bootstrapping (`createBrowserRouter`) + `<AuthProvider>`
+- `src/routes/MainRouter.js` — Route table (public, guest preview, protected dashboard, error pages)
+- `src/context/AuthContext.jsx` — Auth state + Firebase actions (signup/login/google/logout/reset)
+- `src/lib/firebase.js` — Firebase initialization (reads `.env`)
+- `src/lib/validation.js` — Shared validation helpers
+
+Dashboard UI (reused from MP04 and expanded for MP05 routing/auth):
+
+- `src/App.jsx` — loads movies + shared state (browse selection, wishlist)
+- `src/components/MovieSiteLayout.jsx` — dashboard-style navbar + wishlist panel + footer
+- `src/components/Home.jsx` — selected movie panel + filtered/sorted list logic
+- `src/components/SelectedMovieDetails.jsx` — details panel UI
+
+## MiniProject05 Rubric Alignment (High-Level)
+
+1) SPA + Client-side routing
+- Uses React Router with `createBrowserRouter` and nested layouts (`<Outlet />`).
+
+2) Layouts and navigation
+- Shared public layout/navbar for public pages.
+- Protected dashboard routing for authenticated users.
+
+3) Authentication & authorization
+- Firebase Auth integration (Email/Password + Google).
+- Auth state managed via React Context API.
+- Private routing enforced via a protected layout.
+
+4) Error handling pages
+- Dedicated 401 Unauthorized page for protected-route access.
+- Dedicated 404 Not Found page.
+
+5) Environment configuration
+- Firebase config lives in `.env` (see `.env.example`) and is intended to be excluded from git.
