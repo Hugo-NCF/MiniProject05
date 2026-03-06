@@ -5,8 +5,8 @@ import LandingHome from "../components/LandingHome.jsx";
 import Login from "../components/Login.jsx";
 import Signup from "../components/SignUp.jsx";
 import Dashboard from "../components/Dashboard.jsx";
-import Unauthorized from "../components/Unauthorized.jsx";
-import NotFound from "../components/NotFound.jsx";
+import Error1 from "../components/Error1.jsx";
+import Error2 from "../components/Error2.jsx";
 
 const MainRouter = [
   {
@@ -18,10 +18,10 @@ const MainRouter = [
       { path: "signup", Component: Signup },
 
       // second error page (in addition to 404)
-      { path: "401", Component: Unauthorized },
+      { path: "403", Component: Error2 },
 
       // 404 for public pages
-      { path: "*", Component: NotFound },
+      { path: "*", Component: Error1 },
     ],
   },
 
@@ -32,7 +32,7 @@ const MainRouter = [
     children: [
       { index: true, Component: Dashboard },
       // 404 for /dashboard/*
-      { path: "*", Component: NotFound },
+      { path: "*", Component: Error1 },
     ],
   },
 ];
