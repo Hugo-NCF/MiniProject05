@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import RecommendedRow from "./RecommendedRow";
 import SelectedMovieDetails from "./SelectedMovieDetails";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function defaultMovieKey(movie) {
   return `${movie?.title ?? "movie"}-${movie?.releasing_year ?? ""}-${movie?.director ?? ""}`;
@@ -26,6 +27,9 @@ export default function Home({
   wishlistedKeys,
   onToggleWishlistKey,
 }) {
+  const { user } = useAuth();
+  const isAuthed = !!user;
+
   const movieKey = useCallback(
     (movie) => (getMovieKey ?? defaultMovieKey)(movie),
     [getMovieKey],
@@ -113,12 +117,16 @@ export default function Home({
     return movies.find((m) => movieKey(m) === activeSelectedKey) ?? null;
   }, [movies, activeSelectedKey, movieKey]);
 
-  const isLiked = activeSelectedKey != null && likedKeys.has(activeSelectedKey);
-  const isDisliked = activeSelectedKey != null && dislikedKeys.has(activeSelectedKey);
+  const isLiked =
+    isAuthed && activeSelectedKey != null && likedKeys.has(activeSelectedKey);
+  const isDisliked =
+    isAuthed && activeSelectedKey != null && dislikedKeys.has(activeSelectedKey);
   const wishlistSet = wishlistedKeys ?? new Set();
-  const isWishlisted = activeSelectedKey != null && wishlistSet.has(activeSelectedKey);
+  const isWishlisted =
+    isAuthed && activeSelectedKey != null && wishlistSet.has(activeSelectedKey);
 
   function toggleLike() {
+    if (!isAuthed) return;
     if (!activeSelectedKey) return;
 
     setLikedKeys((prev) => {
@@ -135,6 +143,7 @@ export default function Home({
   }
 
   function toggleDislike() {
+    if (!isAuthed) return;
     if (!activeSelectedKey) return;
 
     setDislikedKeys((prev) => {
@@ -151,6 +160,7 @@ export default function Home({
   }
 
   function toggleWishlist() {
+    if (!isAuthed) return;
     if (!activeSelectedKey) return;
     onToggleWishlistKey?.(activeSelectedKey);
   }
@@ -167,12 +177,13 @@ export default function Home({
     <div className="space-y-8">
       <SelectedMovieDetails
         movie={selectedMovie}
+        allowPrivateInfo={isAuthed}
         liked={isLiked}
         disliked={isDisliked}
         wishlisted={isWishlisted}
-        onToggleLike={toggleLike}
-        onToggleDislike={toggleDislike}
-        onToggleWishlist={toggleWishlist}
+        onToggleLike={isAuthed ? toggleLike : undefined}
+        onToggleDislike={isAuthed ? toggleDislike : undefined}
+        onToggleWishlist={isAuthed ? toggleWishlist : undefined}
       />
 
       {browseSelection && displayedMovies.length === 0 ? (

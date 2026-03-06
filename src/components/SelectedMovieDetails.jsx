@@ -88,6 +88,7 @@ function PreciseStars({ value, max = 10 }) {
 
 export default function SelectedMovieDetails({
   movie,
+  allowPrivateInfo = true,
   liked = false,
   disliked = false,
   wishlisted = false,
@@ -112,6 +113,8 @@ export default function SelectedMovieDetails({
 
   const imdbRating = movie?.imdb_rating;
   const hasImdb = Number.isFinite(Number(imdbRating));
+  const showRating = allowPrivateInfo && hasImdb;
+  const showCredits = allowPrivateInfo && (movie?.director || movie?.budget);
 
   return (
     <section className="card bg-base-100 border border-base-300 shadow-md">
@@ -125,7 +128,7 @@ export default function SelectedMovieDetails({
 
             {/* Badges row */}
             <div className="flex flex-wrap items-center gap-3">
-              {hasImdb && (
+              {showRating && (
                 <div className="flex items-center gap-2">
                   <PreciseStars value={imdbRating} />
                   <span className="text-sm text-base-content/70">
@@ -150,12 +153,16 @@ export default function SelectedMovieDetails({
               </p>
             )}
 
-            {(movie?.director || movie?.budget || onToggleLike || onToggleDislike || onToggleWishlist) && (
+            {(showCredits || onToggleLike || onToggleDislike || onToggleWishlist) && (
               <div className="mt-25 flex items-start justify-between gap-4 text-sm text-base-content/70">
-                <div className="space-y-1">
-                  {movie?.director && <div>Director: {formatValue(movie.director)}</div>}
-                  {movie?.budget && <div>Budget: {formatValue(movie.budget)}</div>}
-                </div>
+                {showCredits ? (
+                  <div className="space-y-1">
+                    {movie?.director && <div>Director: {formatValue(movie.director)}</div>}
+                    {movie?.budget && <div>Budget: {formatValue(movie.budget)}</div>}
+                  </div>
+                ) : (
+                  <div />
+                )}
 
                 <div className="flex items-center gap-2 shrink-0">
                   <button
