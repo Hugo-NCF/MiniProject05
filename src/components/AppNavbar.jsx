@@ -17,7 +17,7 @@ export default function AppNavbar({
   onToggleWishlist,
   showBrowseWishlist = true,
 }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const userLabel = user?.displayName || user?.email || "Guest";
   const avatarSrc = user?.photoURL || null;
@@ -155,6 +155,16 @@ export default function AppNavbar({
                 {wishlistCount}
               </span>
             </span>
+          </button>
+        )}
+
+        {user && (
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => logout()}
+          >
+            Logout
           </button>
         )}
 
