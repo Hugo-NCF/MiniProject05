@@ -1,4 +1,5 @@
 import { FaChevronDown, FaFilm } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function AppNavbar({
   loading = false,
@@ -11,6 +12,12 @@ export default function AppNavbar({
   onToggleWishlist,
   showBrowseWishlist = true,
 }) {
+  const { user } = useAuth();
+
+  const userLabel = user?.displayName || user?.email || "Guest";
+  const avatarSrc = user?.photoURL || null;
+  const avatarFallbackLetter = (userLabel?.trim?.()?.[0] || "?").toUpperCase();
+
   function closeBrowseDropdown(e) {
     const details = e?.currentTarget?.closest?.("details.dropdown");
     if (details) details.removeAttribute("open");
@@ -132,12 +139,30 @@ export default function AppNavbar({
           </button>
         )}
 
-        <div className="avatar">
-          <div className="w-14 rounded-full">
-            <img
-              src="https://img.daisyui.com/images/profile/demo/batperson@192.webp"
-              alt="Profile"
-            />
+        <div className="flex flex-col items-center">
+          {user ? (
+            avatarSrc ? (
+              <div className="avatar">
+                <div className="w-14 rounded-full">
+                  <img src={avatarSrc} alt="Profile" />
+                </div>
+              </div>
+            ) : (
+              <div className="avatar placeholder">
+                <div className="bg-base-300 text-base-content w-14 rounded-full flex items-center justify-center">
+                  <span className="text-lg">{avatarFallbackLetter}</span>
+                </div>
+              </div>
+            )
+          ) : (
+            <div className="avatar placeholder">
+              <div className="bg-base-300 text-base-content w-14 rounded-full flex items-center justify-center">
+                <span className="text-lg">G</span>
+              </div>
+            </div>
+          )}
+          <div className="mt-1 w-20 text-center text-xs opacity-70 truncate">
+            {userLabel}
           </div>
         </div>
       </div>
