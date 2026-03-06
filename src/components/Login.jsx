@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
+import { getEmailError } from "../lib/validation.js";
 
 export default function Login() {
   const { login, loginWithGoogle, resetPassword } = useAuth();
@@ -20,10 +21,23 @@ export default function Login() {
     e.preventDefault();
     setErrorMsg("");
     setInfoMsg("");
+
+    const cleanedEmail = email.trim();
+    const emailErr = getEmailError(cleanedEmail);
+    if (emailErr) {
+      setErrorMsg(emailErr);
+      return;
+    }
+
+    if (!password) {
+      setErrorMsg("Password is required.");
+      return;
+    }
+
     setSubmitting(true);
 
     try {
-      await login(email.trim(), password);
+      await login(cleanedEmail, password);
       navigate(fromPath, { replace: true });
     } catch (err) {
       setErrorMsg(err?.message ?? "Login failed");
@@ -52,8 +66,9 @@ export default function Login() {
     setInfoMsg("");
 
     const cleaned = email.trim();
-    if (!cleaned) {
-      setErrorMsg("Enter your email above to reset your password.");
+    const emailErr = getEmailError(cleaned);
+    if (emailErr) {
+      setErrorMsg(emailErr === "Email is required." ? "Enter your email above to reset your password." : emailErr);
       return;
     }
 
@@ -109,6 +124,7 @@ export default function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
+            minLength={6}
             required
           />
         </label>

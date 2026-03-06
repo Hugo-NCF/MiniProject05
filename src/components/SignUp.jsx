@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
+import {
+  getDisplayNameError,
+  getEmailError,
+  getPasswordError,
+} from "../lib/validation.js";
 
 export default function Signup() {
   const { signup, loginWithGoogle } = useAuth();
@@ -18,6 +23,27 @@ export default function Signup() {
     e.preventDefault();
     setErrorMsg("");
 
+    const cleanedName = displayName.trim();
+    const cleanedEmail = email.trim();
+
+    const nameErr = getDisplayNameError(cleanedName);
+    if (nameErr) {
+      setErrorMsg(nameErr);
+      return;
+    }
+
+    const emailErr = getEmailError(cleanedEmail);
+    if (emailErr) {
+      setErrorMsg(emailErr);
+      return;
+    }
+
+    const pwErr = getPasswordError(password, { minLength: 6 });
+    if (pwErr) {
+      setErrorMsg(pwErr);
+      return;
+    }
+
     if (password !== confirm) {
       setErrorMsg("Passwords do not match.");
       return;
@@ -25,7 +51,7 @@ export default function Signup() {
 
     setSubmitting(true);
     try {
-      await signup(email.trim(), password, displayName.trim());
+      await signup(cleanedEmail, password, cleanedName);
       navigate("/dashboard", { replace: true });
     } catch (err) {
       setErrorMsg(err?.message ?? "Signup failed");
@@ -69,6 +95,7 @@ export default function Signup() {
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             autoComplete="name"
+            maxLength={40}
           />
         </label>
 
@@ -96,6 +123,7 @@ export default function Signup() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
+            minLength={6}
             required
           />
         </label>
@@ -110,6 +138,7 @@ export default function Signup() {
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             autoComplete="new-password"
+            minLength={6}
             required
           />
         </label>

@@ -10,6 +10,12 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth, googleProvider } from "../lib/firebase.js";
+import {
+  getDisplayNameError,
+  getEmailError,
+  getPasswordError,
+  isValidEmail,
+} from "../lib/validation.js";
 
 const AuthContext = createContext(null);
 
@@ -47,16 +53,50 @@ export function AuthProvider({ children }) {
 
       async signup(email, password, displayName) {
         requireFirebaseAuth();
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        if (displayName) {
-          await updateProfile(cred.user, { displayName });
+
+        const cleanedEmail = String(email ?? "").trim();
+        const cleanedPassword = String(password ?? "");
+        const cleanedName = String(displayName ?? "").trim();
+
+        const emailErr = getEmailError(cleanedEmail);
+        if (emailErr) throw new Error(emailErr);
+
+        const pwErr = getPasswordError(cleanedPassword, { minLength: 6 });
+        if (pwErr) throw new Error(pwErr);
+
+        const nameErr = getDisplayNameError(cleanedName);
+        if (nameErr) throw new Error(nameErr);
+
+        const cred = await createUserWithEmailAndPassword(
+          auth,
+          cleanedEmail,
+          cleanedPassword,
+        );
+
+        if (cleanedName) {
+          await updateProfile(cred.user, { displayName: cleanedName });
         }
         return cred.user;
       },
 
       async login(email, password) {
         requireFirebaseAuth();
-        const cred = await signInWithEmailAndPassword(auth, email, password);
+
+        const cleanedEmail = String(email ?? "").trim();
+        const cleanedPassword = String(password ?? "");
+
+        const emailErr = getEmailError(cleanedEmail);
+        if (emailErr) throw new Error(emailErr);
+
+        if (!cleanedPassword) {
+          throw new Error("Password is required.");
+        }
+
+        const cred = await signInWithEmailAndPassword(
+          auth,
+          cleanedEmail,
+          cleanedPassword,
+        );
         return cred.user;
       },
 
@@ -76,6 +116,9 @@ export function AuthProvider({ children }) {
         const cleaned = String(email ?? "").trim();
         if (!cleaned) {
           throw new Error("Please enter your email address first.");
+        }
+        if (!isValidEmail(cleaned)) {
+          throw new Error("Please enter a valid email address.");
         }
         await sendPasswordResetEmail(auth, cleaned);
       },
