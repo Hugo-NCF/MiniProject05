@@ -1,5 +1,10 @@
 import { FaChevronDown, FaFilm } from "react-icons/fa";
+import { NavLink } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
+
+function navLinkClass({ isActive }) {
+  return `btn btn-ghost ${isActive ? "btn-active" : ""}`;
+}
 
 export default function AppNavbar({
   loading = false,
@@ -123,6 +128,20 @@ export default function AppNavbar({
       </div>
 
       <div className="flex-none flex items-center gap-4">
+        {!user && (
+          <nav className="flex items-center gap-2">
+            <NavLink to="/" className={navLinkClass}>
+              Home
+            </NavLink>
+            <NavLink to="/login" className={navLinkClass}>
+              Login
+            </NavLink>
+            <NavLink to="/signup" className={navLinkClass}>
+              Signup
+            </NavLink>
+          </nav>
+        )}
+
         {showBrowseWishlist && (
           <button
             type="button"

@@ -54,12 +54,12 @@ export default function Login() {
       )}
 
       <form className="mt-6 space-y-4" onSubmit={onSubmit}>
-        <label className="form-control">
+        <label className="form-control w-full">
           <div className="label">
             <span className="label-text">Email</span>
           </div>
           <input
-            className="input input-bordered"
+            className="input input-bordered w-full"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -68,12 +68,12 @@ export default function Login() {
           />
         </label>
 
-        <label className="form-control">
+        <label className="form-control w-full">
           <div className="label">
             <span className="label-text">Password</span>
           </div>
           <input
-            className="input input-bordered"
+            className="input input-bordered w-full"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -82,7 +82,11 @@ export default function Login() {
           />
         </label>
 
-        <button className="btn btn-primary w-full" disabled={submitting} type="submit">
+        <button
+          className="btn btn-primary w-full mt-2"
+          disabled={submitting}
+          type="submit"
+        >
           {submitting ? "Signing in…" : "Sign in"}
         </button>
 
