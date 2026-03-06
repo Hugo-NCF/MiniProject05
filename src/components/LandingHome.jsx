@@ -1,6 +1,11 @@
 import { Link } from "react-router";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function LandingHome() {
+  const { user } = useAuth();
+  const dashboardHref = user ? "/dashboard" : "/guest";
+  const dashboardLabel = user ? "Dashboard" : "Preview";
+
   return (
     <div className="mx-auto max-w-4xl px-6 py-10">
       <h1 className="text-5xl font-bold text-center">Movies HD</h1>
@@ -19,8 +24,8 @@ export default function LandingHome() {
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
-        <Link className="btn btn-primary" to="/dashboard">
-          Dashboard
+        <Link className="btn btn-primary" to={dashboardHref}>
+          {dashboardLabel}
         </Link>
         <Link className="btn btn-outline" to="/login">
           Login

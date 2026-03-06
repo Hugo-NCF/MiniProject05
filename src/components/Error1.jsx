@@ -1,6 +1,10 @@
 import { Link } from "react-router";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Error1() {
+	const { user } = useAuth();
+	const dashboardHref = user ? "/dashboard" : "/guest";
+
 	return (
 		<div className="mx-auto max-w-xl px-6 py-16 text-center">
 			<h1 className="text-4xl font-bold">404</h1>
@@ -11,7 +15,7 @@ export default function Error1() {
 				<Link className="btn btn-primary" to="/">
 					Go Home
 				</Link>
-				<Link className="btn btn-ghost" to="/dashboard">
+				<Link className="btn btn-ghost" to={dashboardHref}>
 					Dashboard
 				</Link>
 			</div>
