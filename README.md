@@ -8,9 +8,7 @@ It loads a local dataset from `public/movies.json` and provides a dashboard-styl
 
 ## Live Link
 
-Add your deployed link here (Netlify/Vercel/Firebase Hosting):
-
-- TBD
+https://hdmoviesncf2.netlify.app/
 
 ## Tech Stack
 
@@ -21,54 +19,7 @@ Add your deployed link here (Netlify/Vercel/Firebase Hosting):
 - TailwindCSS + DaisyUI for UI
 - React Icons
 
-## How to Run
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Create your environment file (required for auth):
-
-1) Copy `.env.example` to `.env`
-2) Fill in your Firebase web app config values
-
-Start dev server:
-
-```bash
-npm run dev
-```
-
-Build / preview:
-
-```bash
-npm run build
-npm run preview
-```
-
-## Firebase Setup (Auth)
-
-1) Go to https://console.firebase.google.com and create a project.
-2) Build → Authentication → Sign-in method → enable:
-	- Email/Password
-	- Google
-3) Project Settings (gear) → Your apps → Web app (`</>`)
-4) Copy the config values into `.env` (do not commit `.env`).
-
-This project reads these variables:
-
-```dotenv
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-VITE_FIREBASE_MEASUREMENT_ID=
-```
-
-## Routes (User Flow)
+## Routes
 
 Public:
 
@@ -118,7 +69,7 @@ Dashboard UI (reused from MP04 and expanded for MP05 routing/auth):
 - `src/components/Home.jsx` — selected movie panel + filtered/sorted list logic
 - `src/components/SelectedMovieDetails.jsx` — details panel UI
 
-## MiniProject05 Rubric Alignment (High-Level)
+## Rubric Checklist
 
 1) SPA + Client-side routing
 - Uses React Router with `createBrowserRouter` and nested layouts (`<Outlet />`).
